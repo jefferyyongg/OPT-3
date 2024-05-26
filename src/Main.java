@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -18,6 +19,8 @@ public class Main {
                     receptenBoek.load(scanner);
                     break;
                 case "2":
+                    Fridge fridge = new Fridge();
+                    fridge.load(scanner);
                     break;
                 default:
                     System.out.println("ongeldige invoer.");

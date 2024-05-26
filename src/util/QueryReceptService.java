@@ -1,4 +1,8 @@
+package util;
+
 import com.google.gson.Gson;
+import model.ReceptQuery;
+import model.ReceptQueryResult;
 
 import java.io.IOException;
 import java.net.URI;
@@ -22,23 +26,30 @@ public class QueryReceptService extends ReceptApiService {
     }
 
     @Override
-    Recept processHttpResponse(HttpResponse<String> response) {
+    ReceptQueryResult processHttpResponse(HttpResponse<String> response) {
+        ReceptQueryResult receptQueryResult = null;
         Scanner scanner = new Scanner(System.in);
-        Recept recept = null;
         if (response.statusCode() == 200) {
             Gson gson = new Gson();
             ReceptQuery receptQuery = gson.fromJson(response.body(), ReceptQuery.class);
-            System.out.println(receptQuery.getResults().size());
             for (int i = 0; i < receptQuery.getResults().size(); i++) {
                 System.out.printf(i + ". Title: %s\n", receptQuery.getResults().get(i).getTitle());
                 System.out.println();
             }
             System.out.println("Selecteer Recept: \n");
             String input = scanner.nextLine();
-            return receptQuery.getResults().get(Integer.parseInt(input));
+            receptQueryResult = receptQuery.getResults().get(Integer.parseInt(input));
         } else {
             System.out.println(response.statusCode());
         }
-        return recept;
+        return receptQueryResult;
+    }
+
+    @Override
+    public void responseToJson(String input) throws URISyntaxException, IOException, InterruptedException {
+        JsonLoader jsonLoader = new JsonLoader();
+        ReceptApiService receptApiService = new QueryReceptService();
+        HttpResponse<String> response = receptApiService.handleHttpRequest(input);
+        jsonLoader.addRecipe(receptApiService.processHttpResponse(response));
     }
 }
